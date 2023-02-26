@@ -1,25 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-class Product{
+class Product {
   name: string;
   price: number;
   qty: number;
 }
-class Invoice{
+class Invoice {
   customerName: string;
   address: string;
-  contactNo: number;
   email: string;
-  
+  date: Date;
+  number: number;
+  nif: string;
+  telFax: string;
+  cpMunProv: string;
+
   products: Product[] = [];
   additionalDetails: string;
 
-  constructor(){
-    // Initially one empty product row we will show 
+  constructor() {
+    // Initially one empty product row we will show
     this.products.push(new Product());
   }
 }
@@ -29,115 +33,133 @@ class Invoice{
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  invoice = new Invoice(); 
-  
-  generatePDF(action = 'open') {
+  invoice = new Invoice();
+  // async ngOnInit() {
+  //   await this.generatePDF();
+  // }
+
+  async generatePDF(action = 'open') {
+    const baseImponible = this.invoice.products.reduce((sum, p) => sum + (p.qty * p.price), 0).toFixed(2);
+
     let docDefinition = {
       content: [
+
+        // {
+        //   // under NodeJS (or in case you use virtual file system provided by pdfmake)
+        //   // you can also pass file names here
+        //   image: await this.getBase64ImageFromURL("../../assets/image1.jpeg")
+        // },
         {
-          text: 'ELECTRONIC SHOP',
-          fontSize: 16,
-          alignment: 'center',
-          color: '#047886'
-        },
-        {
-          text: 'INVOICE',
-          fontSize: 20,
-          bold: true,
-          alignment: 'center',
-          decoration: 'underline',
-          color: 'skyblue'
-        },
-        {
-          text: 'Customer Details',
-          style: 'sectionHeader'
+          text: 'Factura',
+          fontSize: 42,
+          alignment: 'left',
+          bold: true
+          , margin: [0, 20]
+
         },
         {
           columns: [
             [
               {
-                text: this.invoice.customerName,
-                bold:true
+                text: `Cliente: ${this.invoice.customerName || `Varios`}`,
               },
-              { text: this.invoice.address },
-              { text: this.invoice.email },
-              { text: this.invoice.contactNo }
+              { text: `Domicilio: ${this.invoice.address}` },
+              { text: `N.I.F: ${this.invoice.nif}` },
+              {
+                text: `C.P./Municipio/Provincia ${this.invoice.cpMunProv}`
+              },
+              {
+                text: `Telf:/Fax ${this.invoice.telFax}`
+              }, {
+                text: `Correo electrónico ${this.invoice.email}`
+              }
             ],
             [
               {
-                text: `Date: ${new Date().toLocaleString()}`,
-                alignment: 'right'
+                text: `FACTURA No: ${this.invoice.number}`,
               },
-              { 
-                text: `Bill No : ${((Math.random() *1000).toFixed(0))}`,
-                alignment: 'right'
-              }
+              {
+                text: `Fecha: ${this.invoice.date}`,
+              },
+              {
+                text: `Nombre: Rosario Rodríguez Corrales`,
+                bold: true
+              },
+              {
+                text: `Domicilio: c / Las Cabezas de San Juan n 1, local 11`,
+              },
+              {
+                text: `Provincia: 41701 Dos Hermanas(Sevilla)`,
+              },
+              {
+                text: `C.I.F o N.I.F: 52668169 - D`,
+              },
             ]
           ]
-        },
-        {
-          text: 'Order Details',
-          style: 'sectionHeader'
         },
         {
           table: {
             headerRows: 1,
-            widths: ['*', 'auto', 'auto', 'auto'],
+            widths: ['auto', '*', 'auto', 'auto'],
             body: [
-              ['Product', 'Price', 'Quantity', 'Amount'],
-              ...this.invoice.products.map(p => ([p.name, p.price, p.qty, (p.price*p.qty).toFixed(2)])),
-              [{text: 'Total Amount', colSpan: 3}, {}, {}, this.invoice.products.reduce((sum, p)=> sum + (p.qty * p.price), 0).toFixed(2)]
+              ['CANTIDAD', 'CONCEPTO', 'PRECIO', 'TOTAL'],
+              ...this.invoice.products.map(p => ([p.qty, p.name, p.price, (p.price * p.qty).toFixed(2)])),
+              [{}, {}, { text: 'BASE IMPONIBLE' }, baseImponible],
+              [{}, {}, { text: 'IVA 21%' }, (baseImponible as any / 0.79 * 0.21).toFixed(2)],
+              [{}, {}, { text: 'SUMA TOTAL' }, (baseImponible as any / 0.79).toFixed(2)]
             ]
-          }
-        },
-        {
-          text: 'Additional Details',
-          style: 'sectionHeader'
-        },
-        {
-            text: this.invoice.additionalDetails,
-            margin: [0, 0 ,0, 15]          
-        },
-        {
-          columns: [
-            [{ qr: `${this.invoice.customerName}`, fit: '50' }],
-            [{ text: 'Signature', alignment: 'right', italics: true}],
-          ]
-        },
-        {
-          text: 'Terms and Conditions',
-          style: 'sectionHeader'
-        },
-        {
-            ul: [
-              'Order can be return in max 10 days.',
-              'Warrenty of the product will be subject to the manufacturer terms and conditions.',
-              'This is system generated invoice.',
-            ],
+          }, margin: [0, 20]
         }
+
+
       ],
       styles: {
         sectionHeader: {
           bold: true,
           decoration: 'underline',
           fontSize: 14,
-          margin: [0, 15,0, 15]          
+          margin: [0, 15, 0, 15]
         }
       }
     };
-
-    if(action==='download'){
+    if (action === 'download') {
       pdfMake.createPdf(docDefinition).download();
-    }else if(action === 'print'){
-      pdfMake.createPdf(docDefinition).print();      
-    }else{
-      pdfMake.createPdf(docDefinition).open();      
+    } else if (action === 'print') {
+      pdfMake.createPdf(docDefinition).print();
+    } else {
+      pdfMake.createPdf(docDefinition).open();
     }
 
   }
 
-  addProduct(){
+  getBase64ImageFromURL(url) {
+    return new Promise((resolve, reject) => {
+      var img = new Image();
+      img.setAttribute("crossOrigin", "anonymous");
+
+      img.onload = () => {
+        var canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+
+        var dataURL = canvas.toDataURL("image/png");
+
+        resolve(dataURL);
+      };
+
+      img.onerror = error => {
+        reject(error);
+      };
+
+      img.src = url;
+    });
+  }
+
+  addProduct() {
     this.invoice.products.push(new Product());
   }
-  
-}
+
+};
