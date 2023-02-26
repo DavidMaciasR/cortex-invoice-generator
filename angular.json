@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angular-pdfmake-invoice": {
+    "cortex-invoice-generator": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -18,13 +18,8 @@
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.css"
-            ],
+            "assets": ["src/favicon.ico", "src/assets"],
+            "styles": ["src/styles.css"],
             "scripts": [],
             "vendorChunk": true,
             "extractLicenses": false,
@@ -67,18 +62,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "angular-pdfmake-invoice:build"
+            "browserTarget": "cortex-invoice-generator:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "angular-pdfmake-invoice:build:production"
+              "browserTarget": "cortex-invoice-generator:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "angular-pdfmake-invoice:build"
+            "browserTarget": "cortex-invoice-generator:build"
           }
         },
         "test": {
@@ -88,13 +83,8 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.css"
-            ],
+            "assets": ["src/favicon.ico", "src/assets"],
+            "styles": ["src/styles.css"],
             "scripts": []
           }
         },
@@ -102,15 +92,16 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "angular-pdfmake-invoice:serve"
+            "devServerTarget": "cortex-invoice-generator:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "angular-pdfmake-invoice:serve:production"
+              "devServerTarget": "cortex-invoice-generator:serve:production"
             }
           }
         }
       }
-    }},
-  "defaultProject": "angular-pdfmake-invoice"
+    }
+  },
+  "defaultProject": "cortex-invoice-generator"
 }
