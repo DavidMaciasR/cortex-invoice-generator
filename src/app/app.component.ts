@@ -79,7 +79,7 @@ export class AppComponent {
                 text: `FACTURA No: ${this.invoice.number}`,
               },
               {
-                text: `Fecha: ${this.invoice.date}`,
+                text: `Fecha: ${new Date(this.invoice.date).toLocaleDateString('en-GB')}`,
               },
               {
                 text: `Nombre: Rosario Rodríguez Corrales`,
