@@ -39,7 +39,7 @@ export class AppComponent {
   // }
 
   async generatePDF(action = 'open') {
-    const baseImponible = this.invoice.products.reduce((sum, p) => sum + (p.qty * p.price), 0).toFixed(2);
+    const sumaTotal = this.invoice.products.reduce((sum, p) => sum + (p.qty * p.price), 0).toFixed(2);
 
     let docDefinition = {
       content: [
@@ -104,9 +104,9 @@ export class AppComponent {
             body: [
               ['CANTIDAD', 'CONCEPTO', 'PRECIO', 'TOTAL'],
               ...this.invoice.products.map(p => ([p.qty, p.name, p.price, (p.price * p.qty).toFixed(2)])),
-              [{}, {}, { text: 'BASE IMPONIBLE' }, baseImponible],
-              [{}, {}, { text: 'IVA 21%' }, (baseImponible as any / 0.79 * 0.21).toFixed(2)],
-              [{}, {}, { text: 'SUMA TOTAL' }, (baseImponible as any / 0.79).toFixed(2)]
+              [{}, {}, { text: 'BASE IMPONIBLE' }, (+sumaTotal * 0.79).toFixed(2)],
+              [{}, {}, { text: 'IVA 21%' }, (+sumaTotal * 0.21).toFixed(2)],
+              [{}, {}, { text: 'SUMA TOTAL' }, sumaTotal]
             ]
           }, margin: [0, 20]
         }
