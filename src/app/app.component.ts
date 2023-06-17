@@ -103,7 +103,7 @@ export class AppComponent {
             widths: ['auto', '*', 'auto', 'auto'],
             body: [
               ['CANTIDAD', 'CONCEPTO', 'PRECIO', 'TOTAL'],
-              ...this.invoice.products.map(p => ([p.qty, p.name, p.price, (p.price * p.qty).toFixed(2)])),
+              ...this.invoice.products.map(p => ([p.qty, p.name, (p.price * 0.79).toFixed(2), (p.price * p.qty * 0.79).toFixed(2)])),
               [{}, {}, { text: 'BASE IMPONIBLE' }, (+sumaTotal * 0.79).toFixed(2)],
               [{}, {}, { text: 'IVA 21%' }, (+sumaTotal * 0.21).toFixed(2)],
               [{}, {}, { text: 'SUMA TOTAL' }, sumaTotal]
